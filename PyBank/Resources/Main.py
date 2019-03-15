@@ -1,59 +1,59 @@
 import os
 import csv
 
-csvpath = os.path.join('..',"Resources","budget_data.csv")
+#csvpath = os.path.join('..',"Resources","budget_data.csv")
+reading_file = os.path.join('..',"Resources","budget_data.csv")
+output_file =  "Analysis/budget_analysis_1.txt"
 
-# Should I be using DictReader?
-#with open(csvpath, newline="") as csvfile:
-#csvreader=csv.DictReader(csvfile)
+#My list of variables for my output:
+month_list = 0
+prev_profit_loss = 0
+month_of_change = []
+profit_loss_change_list = []
+greatest_increase_profits = ["", 0]
+greatest_decrease_loss = ["", 99999999999]
+total_profit_loss = 0
 
+# Chris told me he didn't know what DictReader was and told me no to use it...
+# so I find it interesting that the solved video shows them using DictReader.
+# I decided to incorporate it back into my code since I think it is a very useful tool.
+with open(reading_file) as revenue_data:
+    reader=csv.DictReader(revenue_data)
 
-with open(csvpath, newline="") as csvfile:
-    csvreader=csv.reader(csvfile)
-    
-#My attempts at #1.......
+    for row in reader:
+        #Tracking my total months and net total amount of "Profit/Losses"
+        month_list = month_list +1
+        total_profit_loss = total_profit_loss + int(row["Profit/Losses"])
+        #Tracking the "Profit/Losses" changes
+        profit_loss_change = int(row["Profit/Losses"]) - prev_profit_loss
+        prev_profit_loss = int(row["Profit/Losses"])
+        profit_loss_change_list = profit_loss_change_list + [profit_loss_change]
+        month_of_change = month_of_change + [row["Date"]]
+        #Calculating the greatest increase in profits
+        if (profit_loss_change > greatest_increase_profits[1]):
+            greatest_increase_profits[0] = row["Date"]
+            greatest_increase_profits[1] = profit_loss_change
+        #Calculating the greatest decrease in losses
+        if (profit_loss_change < greatest_decrease_loss[1]):
+            greatest_decrease_loss[0] = row["Date"]
+            greatest_decrease_loss[1] = profit_loss_change
+        #Calculating the average profit/loss change
+            profit_loss_avg = sum(profit_loss_change_list)/len(profit_loss_change_list)
+            #I'm not getting the same number value as the answer in the homework example...
+            #but everything else printed the same. Did I write my calculation wrong?
+# Creating my output summary
+Output= (
+f"\nFinancial Analysis\n"
+f"Total Months: {month_list}\n"
+f"Total: ${total_profit_loss}\n"
+f"Average Change: ${profit_loss_avg}\n"
+f"Greatest Increase in Profits: {greatest_increase_profits[0]} (${greatest_increase_profits[1]})\n"
+f"Greatest Decrease in Revenue: {greatest_decrease_loss[0]} (${greatest_decrease_loss[1]})\n"
+)
 
-#1st attempt:
-       for i in csvreader:
-           Months = i['Date']
-           print(set(Months))
-           break    
-# When I run this I just get the actual date in the first cell populating.
-    
-#My 2nd attempt:
-    Month_list = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    unique_month_counter = []
-    #Profit_Losses = ['Profit','Losses']
-    #Loss_Count = []
-    
-    for i in Month_list:
-        if i not in unique_month_counter:
-            unique_month_counter.append(i)
-            unique_month_counter2=len(unique_month_counter)
-            print("Total Months: ",int(unique_month_counter2))         
-        break
-# I feel like I'm so close but when I run this I get: "Total Months: 1" it appears it is only reading one value in the first cell and not reading the whole column.
+#Printing my output
+print(Output)
 
-
-#My attempt at #2: ......(Net Total of Profit/Losses)       
-#got error when trying to use float
-netprofit=0   
-
-    for row in csvreader:
-        netprofit += int(row[1])
-        print(netprofit)
-
-        break
-# (No sure what error means):  Traceback (most recent call last):
-#                              netprofit += int(row[1])
-#                              ValueError: invalid literal for int() with base 10: 'Profit/Losses'
-
-#3:.......
-#Use a for loop to calculate the average change looping through each month
-
-
-#4:.......
-#Greatest increase in profits use max() function
-
-#5:.......
-#Greatest decrease in profits use min() function
+#Exporting my results to a text file
+with open(output_file,"w") as txt_file:
+    txt_file.write(Output)
