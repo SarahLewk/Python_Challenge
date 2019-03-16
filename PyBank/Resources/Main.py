@@ -20,6 +20,7 @@ total_profit_loss = 0
 with open(reading_file) as revenue_data:
     reader=csv.DictReader(revenue_data)
 
+    prev_profit_loss = 0
     for row in reader:
         #Tracking my total months and net total amount of "Profit/Losses"
         month_list = month_list +1
